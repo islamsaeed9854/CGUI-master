@@ -26,15 +26,9 @@ namespace CGAlgorithms.Algorithms.ConvexHull
         public override void Run(List<Point> points, List<Line> lines, List<Polygon> polygons, ref List<Point> outPoints, ref List<Line> outLines, ref List<Polygon> outPolygons)
         {
             outPoints = new List<Point>();
-            if (points.Count == 1)
+            if (points.Count <= 1)
             {
-                outPoints.Add(points[0]);
-                return;
-            }
-            else if (points.Count == 2)
-            {
-                outPoints.Add(points[0]);
-                outPoints.Add(points[1]);
+                outPoints = points;
                 return;
             }
             double min_y = 100000000;
@@ -68,21 +62,23 @@ namespace CGAlgorithms.Algorithms.ConvexHull
                 Point p = outPoints[idx];
                 Point q = outPoints[idx-1];
                 Line ln = new Line(p, q);
-                if((HelperMethods.CheckTurn(ln, points[c_p.Value]))==Enums.TurnType.Left)
+                while( (idx>=2) && (((HelperMethods.CheckTurn(ln, points[c_p.Value]))==Enums.TurnType.Left) || ((HelperMethods.CheckTurn(ln, points[c_p.Value])) == Enums.TurnType.Colinear)) )
                 {
                     outPoints.RemoveAt(idx);
-                    outPoints.Add(points[c_p.Value]);
+                    idx--;
+                    p = outPoints[idx];
+                    q = outPoints[idx - 1]; ;
+                    ln = new Line(p, q);
                 }
-                else
-                {
-                    if (outPoints[idx].X == 100000000)
+
+                if (outPoints[idx].X == 100000000)
                     {
                         outPoints.RemoveAt(idx);
                         idx--;
                     }
                     outPoints.Add(points[c_p.Value]);
                     idx++;
-                }
+                
             }
             foreach(var x in outPoints)
             {
